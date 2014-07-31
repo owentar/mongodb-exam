@@ -1,0 +1,58 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context-3.0.xsd
+          http://www.springframework.org/schema/data/mongo
+          http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd
+          http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+ 
+	<context:property-placeholder location="classpath:mongo.properties" />
+	
+	<mongo:mongo id="mongo" host="${mongo.host}" port="${mongo.port}" />
+	
+	<mongo:db-factory id="mongoDbFactory" dbname="${mongo.dbname}" mongo-ref="mongo" />
+ 
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+	</bean>
+	
+	<!-- Repositories -->
+	<bean id="populationRepository" class="com.adthena.data.PopulationRepository">
+		<constructor-arg name="mongoOps" ref="mongoTemplate" />
+		<constructor-arg name="resources">
+			<map>
+				<entry key="annualGrowth_map" value="classpath:data/population/annualGrowth_map.js" />
+				<entry key="annualGrowth_reduce" value="classpath:data/population/annualGrowth_reduce.js" />
+				<entry key="averageRateGrowthDeviation_map" value="classpath:data/population/averageRateGrowthDeviation_map.js" />
+				<entry key="averageRateGrowthDeviation_reduce" value="classpath:data/population/averageRateGrowthDeviation_reduce.js" />
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<!-- Commands -->
+	<bean id="populateCommand" class="com.adthena.commands.PopulateCommand">
+		<constructor-arg name="mongoOps" ref="mongoTemplate" />
+	</bean>
+	
+	<bean id="annualGrowthCommand" class="com.adthena.commands.AnnualGrowthCommand">
+		<constructor-arg name="populationRepository" ref="populationRepository" />
+	</bean>
+	
+	<bean id="averageRateGrowthDeviationCommand" class="com.adthena.commands.AverageRateGrowthDeviationCommand">
+		<constructor-arg name="populationRepository" ref="populationRepository" />
+	</bean>
+	
+	<bean id="commandHandler" class="com.adthena.commands.CommandHandler">
+		<constructor-arg name="commandMap">
+			<map>
+				<entry key="populate" value-ref="populateCommand"></entry>
+				<entry key="annualGrowth" value-ref="annualGrowthCommand"></entry>
+				<entry key="avgDeviation" value-ref="averageRateGrowthDeviationCommand"></entry>
+			</map>
+		</constructor-arg>
+	</bean>
+ 
+</beans>
