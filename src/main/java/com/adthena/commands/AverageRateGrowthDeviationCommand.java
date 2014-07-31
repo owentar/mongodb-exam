@@ -10,6 +10,8 @@ import com.adthena.model.AverageRateGrowthDeviation;
 
 public class AverageRateGrowthDeviationCommand implements Command {
 	
+	private static final int DEFAULT_TOP_RESULTS = 2;
+	
 	private Logger logger = LoggerFactory.getLogger(AverageRateGrowthDeviationCommand.class);
 
 	private PopulationRepository populationRepository;
@@ -21,8 +23,8 @@ public class AverageRateGrowthDeviationCommand implements Command {
 	public void execute() {
 		populationRepository.updateAverangeRateGrowthDeviation();
 		
-		// TODO: support parameter on the execute method and remove the magic number 2 from here
-		List<AverageRateGrowthDeviation> result = populationRepository.findTopAverangeRateGrowthDeviation(2);
+		// TODO: support parameter on the execute method
+		List<AverageRateGrowthDeviation> result = populationRepository.findTopAverangeRateGrowthDeviation(DEFAULT_TOP_RESULTS);
 
 		logger.info("Top two deviations:");
 		for (AverageRateGrowthDeviation averageDeviation : result) {
