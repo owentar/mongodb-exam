@@ -10,6 +10,8 @@ import com.adthena.model.AnnualGrowth;
 
 public class AnnualGrowthCommand implements Command {
 	
+	private static final int DEFAULT_TOP_RESULTS = 2;
+	
 	private Logger logger = LoggerFactory.getLogger(AnnualGrowthCommand.class);
 
 	private PopulationRepository populationRepository;
@@ -21,7 +23,7 @@ public class AnnualGrowthCommand implements Command {
 	public void execute() {
 		populationRepository.updateAnnualGrowth();
 		
-		List<AnnualGrowth> result = populationRepository.findTopAnnualGrowths(2);
+		List<AnnualGrowth> result = populationRepository.findTopAnnualGrowths(DEFAULT_TOP_RESULTS);
 		
 		logger.info("Top two annual growth:");
 		for (AnnualGrowth annualGrowth : result) {
